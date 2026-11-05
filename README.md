@@ -37,9 +37,120 @@ react-native/
 - **Stripe** - Payment processing
 - **Jest** - Testing framework
 
-## Available Scripts
+## Client Architecture
 
-### Client
+### File Structure
+The client follows a feature-based directory structure under `app/`:
+
+```
+client/app/
+├── navigation/     # Route configuration and navigator setup
+├── components/     # Reusable UI components (organized by layout, common, etc.)
+├── providers/      # React context providers (Auth, Theme, etc.)
+├── hooks/          # Custom React hooks
+├── store/          # Redux store configuration and slices
+├── services/       # API services and external integrations
+├── types/          # TypeScript type definitions
+├── config/         # Application configuration
+├── app.tsx         # Root App component
+└── main.tsx        # Entry point
+```
+
+### Key Architecture Patterns
+- **React Navigation + expo-router**: File-based routing with deep linking support
+- **Redux Toolkit + redux-persist**: Global state management with persistence
+- **React Query**: Server state management, caching, and synchronization
+- **Context API**: For theming, authentication, and other global concerns
+- **Custom hooks**: Encapsulating reusable logic (useAuth, useCart, useDebounce, etc.)
+- **Component composition**: UI built with reusable, composable components
+
+### Navigation
+- File-based routing using `expo-router`
+- Custom navigator via `PrivateNavigator`
+- Bottom tab menu for authenticated users
+- Protected routes based on authentication state
+
+### State Management
+- **Redux Toolkit**: Global state (user, cart, favorites)
+- **redux-persist**: Persists storage across app launches
+- **React Query**: Server data fetching, caching, and synchronization
+- **Local hooks**: Component-local state management
+
+---
+
+## Server Architecture
+
+### File Structure
+The server follows a modular NestJS structure under `src/`:
+
+```
+server/src/
+├── auth/           # Authentication module (JWT, local strategies)
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── auth.module.ts
+│   ├── dto/        # Authentication DTOs
+│   ├── decorators/ # Custom decorators (Auth, CurrentUser)
+│   └── strategies/ # JWT strategies
+├── user/           # User management module
+│   ├── user.controller.ts
+│   ├── user.service.ts
+│   ├── user.module.ts
+│   └── dto/        # User DTOs
+├── product/        # Product module
+│   ├── product.controller.ts
+│   ├── product.service.ts
+│   ├── product.module.ts
+│   └── dto/        # Product DTOs
+├── category/       # Category module
+│   ├── category.controller.ts
+│   ├── category.service.ts
+│   ├── category.module.ts
+│   └── dto/        # Category DTOs
+├── order/          # Order module
+│   ├── order.controller.ts
+│   ├── order.service.ts
+│   ├── order.module.ts
+│   └── dto/        # Order DTOs
+├── app.controller.ts    # Root controller
+├── app.service.ts       # Root service
+├── app.module.ts        # Root module
+├── main.ts              # Application entry point
+├── prisma-service.ts    # Prisma service configuration
+├── decorators/          # Custom decorators (Auth, CurrentUser)
+├── config/              # Configuration files
+└── generated/           # Prisma client generation
+```
+
+### Key Architecture Patterns
+- **NestJS Modular Structure**: Feature-based modules (auth, user, product, category, order)
+- **Dependency Injection**: Services injected via constructor
+- **Prisma ORM**: Type-safe database access with auto-generated client
+- **JWT Authentication**: Access and refresh token pattern
+- **Guard-based Protection**: `@Auth()` decorator guards routes
+- **Pipe-based Validation**: `@ValidationPipe` for DTO validation
+- **DTO Pattern**: `class-validator` and `class-transformer` for data validation/transformation
+- **Service Layer**: Business logic separated from controllers
+
+### API Organization
+- **Controllers**: HTTP request handling
+- **Services**: Business logic
+- **Modules**: Feature grouping and encapsulation
+- **DTOs**: Request/response data transfer objects
+- **Decorators**: Custom pipeline elements (guards, pipes, current user)
+
+### Database
+- **PostgreSQL** as the relational database
+- **Prisma ORM** for type-safe database operations
+- **Schema** defines: User, Product, Category, Order, OrderItem models
+- **Migrations** managed via Prisma migration system
+
+### Middleware & Pipeline
+- CORS enabled globally
+- Global prefix `api`
+- Request validation using pipes
+- Authentication via JWT strategy
+- Role-based access control through guards
 Navigate to `client/` directory:
 
 - `npm start` or `expo start` - Start the Expo development server
